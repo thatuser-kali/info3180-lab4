@@ -46,24 +46,9 @@ def upload():
         
         flash('File Saved', 'success')
         return render_template('home.html', filename=filename, description=description)
-    else: 
-        return render_template('upload.html', form = uploadform)
+        
+    return render_template('upload.html', form = uploadform)
 
-def get_uploaded_images():
-    rootdir = os.getcwd()
-    print rootdir
-    ls = []
-    for subdir, dirs, files in os.walk(rootdir + '/app/static/uploads'):
-        for file in files:
-            ls.append(os.path.join(subdir, file).split('/')[-1])
-    return ls
-    
-@app.route('/files')
-def files():
-    if not session.get('logged_in'):
-        abort(401)
-    file = get_uploaded_images()
-    return render_template('files.html', files = file)
 
 
 
