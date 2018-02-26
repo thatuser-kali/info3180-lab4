@@ -35,6 +35,7 @@ def upload():
     uploadform = UploadForm()
     # Validate file upload on submit
     if request.method == 'POST' and uploadform.validate_on_submit():
+        print uploadform.csrf_token
         # Get file data and save to your uploads folder
         photo = uploadform.photo.data 
         description = uploadform.description.data
@@ -46,11 +47,10 @@ def upload():
         
         flash('File Saved', 'success')
         return render_template('home.html', filename=filename, description=description)
-        
+    else: 
+        print uploadform.errors.items()
+        flash('Not saved','error')
     return render_template('upload.html', form = uploadform)
-
-
-
 
 
 @app.route('/login', methods=['POST', 'GET'])
