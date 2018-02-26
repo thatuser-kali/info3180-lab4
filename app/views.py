@@ -8,6 +8,7 @@ import os
 from app import app
 from flask import render_template, request, redirect, url_for, flash, session, abort
 from werkzeug.utils import secure_filename
+from forms import UploadForm
 
 
 ###
@@ -23,32 +24,30 @@ def home():
 @app.route('/about/')
 def about():
     """Render the website's about page."""
-    return render_template('about.html', name="Mary Jane")
+    return render_template('about.html', name="Kali")
 
 
 @app.route('/upload', methods=['POST', 'GET'])
 def upload():
     if not session.get('logged_in'):
         abort(401)
-    uploadform = UploadForm()
-
-    if request.method == 'POST':
-        if uploadform.validate_on_submit():
-            print uploadform.csrf_token
-            photo = uploadform.photo.data 
-            description = uploadform.description.data
     
-            filename = secure_filename(photo.filename)
-            photo.save(os.path.join(
-                app.config['UPLOAD_FOLDER'], filename
-            ))
-            
-            flash('File Saved', 'success')
-            return render_template('home.html', filename=filename, description=description)
-        else: 
-            print uploadform.errors.items()
-            flash('Not saved','error')
-    return render_template('upload.html', form = uploadform)
+    uploadform = UploadForm()
+    # Validate file upload on submit
+    if request.method == 'POST' and uploadform.validate_on_submit():
+        # Get file data and save to your uploads folder
+        photo = uploadform.photo.data 
+        description = uploadform.description.data
+
+        filename = secure_filename(photo.filename)
+        photo.save(os.path.join(
+            app.config['UPLOAD_FOLDER'], filename
+        ))
+        
+        flash('File Saved', 'success')
+        return render_template('home.html', filename=filename, description=description)
+    else: 
+        return render_template('upload.html', form = uploadform)
 
 def get_uploaded_images():
     rootdir = os.getcwd()
@@ -63,8 +62,8 @@ def get_uploaded_images():
 def files():
     if not session.get('logged_in'):
         abort(401)
-    f = get_uploaded_images()
-    return render_template('files.html', files = f)
+    file = get_uploaded_images()
+    return render_template('files.html', files = file)
 
 
 
@@ -94,13 +93,14 @@ def logout():
 # The functions below should be applicable to all Flask apps.
 ###
 
+# Flash errors from the form if validation fails
 def flash_errors(form):
     for field, errors in form.errors.items():
         for error in errors:
             flash(u"Error in the %s field - %s" % (
                 getattr(form, field).label.text,
                 error
-), 'danger')
+            ), 'danger')
 
 @app.route('/<file_name>.txt')
 def send_text_file(file_name):
