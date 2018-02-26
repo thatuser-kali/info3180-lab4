@@ -9,4 +9,4 @@ class UploadForm(FlaskForm):
         FileRequired(),
         FileAllowed(['jpg', 'png', 'Images only!'])
     ])
-description = StringField('Description', validators=[DataRequired()])
+    description = StringField('Description', validators=[DataRequired()])

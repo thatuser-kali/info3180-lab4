@@ -34,22 +34,23 @@ def upload():
     
     uploadform = UploadForm()
     # Validate file upload on submit
-    if request.method == 'POST' and uploadform.validate_on_submit():
-        print uploadform.csrf_token
-        # Get file data and save to your uploads folder
-        photo = uploadform.photo.data 
-        description = uploadform.description.data
-
-        filename = secure_filename(photo.filename)
-        photo.save(os.path.join(
-            app.config['UPLOAD_FOLDER'], filename
-        ))
-        
-        flash('File Saved', 'success')
-        return render_template('home.html', filename=filename, description=description)
-    else: 
-        print uploadform.errors.items()
-        flash('Not saved','error')
+    if request.method == 'POST':
+        if uploadform.validate_on_submit():
+            print uploadform.csrf_token
+            # Get file data and save to your uploads folder
+            photo = uploadform.photo.data 
+            description = uploadform.description.data
+    
+            filename = secure_filename(photo.filename)
+            photo.save(os.path.join(
+                app.config['UPLOAD_FOLDER'], filename
+            ))
+            
+            flash('File Saved', 'success')
+            return render_template('home.html', filename=filename, description=description)
+        else:
+            print uploadform.errors.items()
+            flash('Not saved','error')
     return render_template('upload.html', form = uploadform)
 
 
